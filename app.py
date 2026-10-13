@@ -30,6 +30,10 @@ with st.sidebar:
     st.caption("当前去重键：order_id + sku；币种：人民币。")
 
 sample_path = Path(__file__).parent / "sample_data" / "orders_1.csv"
+sample_paths = [
+    Path(__file__).parent / "sample_data" / "orders_1.csv",
+    Path(__file__).parent / "sample_data" / "orders_2.csv",
+]
 if sample_path.exists():
     st.download_button(
         "下载示例 CSV",
@@ -38,12 +42,20 @@ if sample_path.exists():
         mime="text/csv",
     )
 
-files = st.file_uploader(
+if st.button("使用内置示例数据", help="立即加载两份模拟订单，不会上传真实数据。"):
+    st.session_state["demo_mode"] = True
+
+if st.query_params.get("demo") == "true":
+    st.session_state["demo_mode"] = True
+
+uploaded_files = st.file_uploader(
     "上传订单文件",
     type=["csv", "xlsx"],
     accept_multiple_files=True,
     help="可以同时上传多个文件；所有文件必须包含相同的必要字段。",
 )
+
+files = sample_paths if st.session_state.get("demo_mode") else uploaded_files
 
 if not files:
     st.info("请上传订单文件开始分析。你也可以先下载示例 CSV 查看数据格式。")
@@ -58,7 +70,8 @@ except Exception:
     st.error("处理文件时发生未知错误，请检查文件格式后重试。")
     st.stop()
 
-st.success(f"已成功处理 {len(files)} 个文件。")
+source_label = "内置示例" if st.session_state.get("demo_mode") else "上传"
+st.success(f"已成功处理 {len(files)} 个{source_label}文件。")
 
 metric_1, metric_2, metric_3, metric_4 = st.columns(4)
 metric_1.metric("总销售额", f"¥{stats['total_sales']:,.2f}")

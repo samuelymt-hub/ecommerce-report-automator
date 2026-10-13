@@ -33,7 +33,7 @@ python -m pip install -r requirements.txt
 python -m streamlit run app.py
 ```
 
-打开 <http://localhost:8501>，上传 `sample_data` 中的两个样例文件即可体验完整流程。
+打开 <http://localhost:8501>，点击“使用内置示例数据”，或上传 `sample_data` 中的两个样例文件，即可体验完整流程。
 
 ### 输入字段
 
@@ -101,7 +101,7 @@ python -m pip install -r requirements.txt
 python -m streamlit run app.py
 ```
 
-Open <http://localhost:8501> and upload both files from `sample_data`.
+Open <http://localhost:8501> and click **使用内置示例数据**, or upload both files from `sample_data`.
 
 ### Expected sample result
 
