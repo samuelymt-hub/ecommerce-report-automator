@@ -6,7 +6,190 @@ import plotly.express as px
 import plotly.graph_objects as go
 import streamlit as st
 
-from processor import REQUIRED_COLUMNS, export_report, process_orders
+from processor import (
+    DEFAULT_DEDUPE_COLUMNS,
+    REQUIRED_COLUMNS,
+    export_report,
+    inspect_order_columns,
+    process_orders_with_quality,
+    suggest_column_mapping,
+)
+
+
+COPY = {
+    "zh": {
+        "nav_dashboard": "▦　Dashboard",
+        "nav_orders": "▤　订单分析",
+        "nav_products": "◫　商品表现",
+        "nav_export": "↧　报表导出",
+        "file_schema": "订单文件规范",
+        "rules": "当前业务规则",
+        "dedupe": "去重键",
+        "currency": "结算币种",
+        "no_storage": "未配置持久化数据存储",
+        "title": "销售运营仪表盘",
+        "subtitle": "合并订单、清理异常数据并生成可交付的销售报表。",
+        "session": "● 会话内处理",
+        "quick_start": "快速体验",
+        "quick_caption": "使用模拟订单即时预览完整仪表盘。",
+        "use_demo": "使用内置示例数据",
+        "demo_help": "立即加载两份模拟订单，不会上传真实数据。",
+        "download_sample": "下载示例 CSV",
+        "import_orders": "导入订单",
+        "upload_label": "拖放或选择 CSV / XLSX 文件",
+        "upload_help": "可同时上传多个文件；系统会自动识别常见中英文列名。",
+        "upload_limit": "支持 CSV、XLSX · 单个文件不超过 200 MB",
+        "privacy": "公开演示请仅使用模拟或脱敏数据，请勿上传姓名、电话、地址等敏感信息。",
+        "empty_title": "准备好生成第一份销售报告了吗？",
+        "empty_text": "选择内置示例，或上传你的订单文件开始分析。",
+        "config_title": "② 确认字段与处理规则",
+        "config_caption": "系统已自动匹配常见中英文列名；如有需要，可在下方调整。",
+        "field_mapping": "字段映射",
+        "not_mapped": "— 未映射 —",
+        "dedupe_fields": "去重字段",
+        "dedupe_help": "相同字段组合只保留第一条记录。",
+        "currency_label": "显示币种",
+        "report_name": "报表文件名",
+        "processing_failed": "处理失败",
+        "unknown_error": "处理文件时发生未知错误，请检查文件格式后重试。",
+        "processed": "已成功处理 {count} 个{source}文件。",
+        "source_demo": "内置示例",
+        "source_upload": "上传",
+        "total_sales": "总销售额",
+        "avg_order": "平均订单金额",
+        "valid_orders": "有效订单",
+        "units": "销售件数",
+        "summary_done": "已完成汇总",
+        "per_order": "按有效订单",
+        "details": "{count} 条明细",
+        "cleaned": "清理 {count} 条",
+        "quality_summary": "原始记录 {original} 条 · 去除重复 {duplicates} 条 · 排除无效数据 {invalid} 条",
+        "tab_dashboard": "Dashboard",
+        "tab_products": "商品分析",
+        "tab_details": "订单明细",
+        "tab_quality": "数据质量",
+        "sales_trend": "销售趋势",
+        "date": "日期",
+        "sales_amount": "销售额",
+        "product_share": "商品销售占比",
+        "daily_detail": "每日销售明细",
+        "order_count": "订单数",
+        "sales_units": "销售数量",
+        "product_ranking": "商品销售额排行",
+        "product": "商品",
+        "clean_orders": "清洗后订单",
+        "valid_caption": "共 {count} 条有效明细，可直接导出交付。",
+        "download_excel": "下载 Excel 报表",
+        "quality_title": "数据质量报告",
+        "quality_caption": "每一条被排除的记录都会保留来源文件和具体原因。",
+        "raw_rows": "原始记录",
+        "valid_rows": "有效记录",
+        "duplicate_rows": "重复记录",
+        "invalid_rows": "异常记录",
+        "rejected_title": "排除记录明细",
+        "download_rejected": "下载排除记录 CSV",
+        "quality_passed": "没有发现重复或异常数据，本次文件全部通过质量检查。",
+    },
+    "en": {
+        "nav_dashboard": "▦　Dashboard",
+        "nav_orders": "▤　Order analysis",
+        "nav_products": "◫　Product performance",
+        "nav_export": "↧　Report export",
+        "file_schema": "Required order fields",
+        "rules": "Current rules",
+        "dedupe": "Deduplication key",
+        "currency": "Display currency",
+        "no_storage": "No persistent data storage configured",
+        "title": "Sales Operations Dashboard",
+        "subtitle": "Merge orders, remove invalid data, and generate delivery-ready sales reports.",
+        "session": "● Session processing",
+        "quick_start": "Quick start",
+        "quick_caption": "Preview the full dashboard with synthetic orders.",
+        "use_demo": "Use built-in sample data",
+        "demo_help": "Load two synthetic order files instantly.",
+        "download_sample": "Download sample CSV",
+        "import_orders": "Import orders",
+        "upload_label": "Drop or select CSV / XLSX files",
+        "upload_help": "Upload multiple files; common Chinese and English headers are detected automatically.",
+        "upload_limit": "CSV and XLSX · Up to 200 MB per file",
+        "privacy": "Use synthetic or de-identified data only. Do not upload names, phone numbers, addresses, or other sensitive information.",
+        "empty_title": "Ready to generate your first sales report?",
+        "empty_text": "Load the sample data or upload your order files to begin.",
+        "config_title": "② Confirm fields and processing rules",
+        "config_caption": "Common Chinese and English headers are matched automatically. Adjust them below if needed.",
+        "field_mapping": "Field mapping",
+        "not_mapped": "— Not mapped —",
+        "dedupe_fields": "Deduplication fields",
+        "dedupe_help": "Only the first row for each matching field combination is kept.",
+        "currency_label": "Display currency",
+        "report_name": "Report file name",
+        "processing_failed": "Processing failed",
+        "unknown_error": "An unexpected error occurred. Check the file format and try again.",
+        "processed": "Successfully processed {count} {source} file(s).",
+        "source_demo": "sample",
+        "source_upload": "uploaded",
+        "total_sales": "Total sales",
+        "avg_order": "Average order value",
+        "valid_orders": "Valid orders",
+        "units": "Units sold",
+        "summary_done": "Summary ready",
+        "per_order": "Per valid order",
+        "details": "{count} line items",
+        "cleaned": "Removed {count}",
+        "quality_summary": "{original} input rows · {duplicates} duplicates · {invalid} invalid rows",
+        "tab_dashboard": "Dashboard",
+        "tab_products": "Products",
+        "tab_details": "Order details",
+        "tab_quality": "Data quality",
+        "sales_trend": "Sales trend",
+        "date": "Date",
+        "sales_amount": "Sales",
+        "product_share": "Product sales share",
+        "daily_detail": "Daily sales",
+        "order_count": "Orders",
+        "sales_units": "Units sold",
+        "product_ranking": "Product sales ranking",
+        "product": "Product",
+        "clean_orders": "Cleaned orders",
+        "valid_caption": "{count} valid line items, ready to export.",
+        "download_excel": "Download Excel report",
+        "quality_title": "Data quality report",
+        "quality_caption": "Every excluded row retains its source file and a specific rejection reason.",
+        "raw_rows": "Input rows",
+        "valid_rows": "Valid rows",
+        "duplicate_rows": "Duplicates",
+        "invalid_rows": "Invalid rows",
+        "rejected_title": "Excluded row details",
+        "download_rejected": "Download excluded rows CSV",
+        "quality_passed": "No duplicates or invalid rows were found. Every row passed the quality checks.",
+    },
+}
+
+FIELD_LABELS = {
+    "zh": {
+        "order_id": "订单编号",
+        "date": "下单日期",
+        "product": "商品名称",
+        "sku": "商品 SKU",
+        "quantity": "数量",
+        "unit_price": "单价",
+    },
+    "en": {
+        "order_id": "Order ID",
+        "date": "Order date",
+        "product": "Product name",
+        "sku": "Product SKU",
+        "quantity": "Quantity",
+        "unit_price": "Unit price",
+    },
+}
+
+CURRENCIES = {
+    "CNY (¥)": "¥",
+    "USD ($)": "$",
+    "EUR (€)": "€",
+    "GBP (£)": "£",
+}
 
 
 st.set_page_config(
@@ -204,6 +387,12 @@ st.markdown(
     .empty-state h3 { margin: .35rem 0; color: var(--ink); }
     .empty-state p { margin: 0; color: var(--muted); }
     #MainMenu, footer { visibility: hidden; }
+    @media (max-width: 1100px) {
+        .block-container { padding: 1.4rem 1.5rem 3rem; }
+        [data-testid="stMetric"] { min-height: 7rem; padding: .9rem; }
+        [data-testid="stMetricValue"] { font-size: 1.35rem; }
+        [data-testid="stMetricDelta"] { font-size: .72rem; }
+    }
     @media (max-width: 800px) {
         .block-container { padding: 1.2rem 1rem 2.5rem; }
         .page-header { align-items: flex-start; flex-direction: column; }
@@ -215,39 +404,53 @@ st.markdown(
 )
 
 
+language_name = st.sidebar.selectbox(
+    "界面语言 / Language",
+    ["中文", "English"],
+    index=0 if st.session_state.get("language", "zh") == "zh" else 1,
+)
+language = "zh" if language_name == "中文" else "en"
+st.session_state["language"] = language
+
+
+def t(key: str, **values: object) -> str:
+    """Return localized interface copy."""
+    return COPY[language][key].format(**values)
+
+
 with st.sidebar:
     st.markdown(
         '<div class="brand"><span class="brand-mark">◈</span> REPORTLY</div>',
         unsafe_allow_html=True,
     )
-    st.markdown('<div class="nav-active">▦　Dashboard</div>', unsafe_allow_html=True)
-    st.markdown('<div class="nav-item">▤　订单分析</div>', unsafe_allow_html=True)
-    st.markdown('<div class="nav-item">◫　商品表现</div>', unsafe_allow_html=True)
-    st.markdown('<div class="nav-item">↧　报表导出</div>', unsafe_allow_html=True)
+    st.markdown(f'<div class="nav-active">{t("nav_dashboard")}</div>', unsafe_allow_html=True)
+    st.markdown(f'<div class="nav-item">{t("nav_orders")}</div>', unsafe_allow_html=True)
+    st.markdown(f'<div class="nav-item">{t("nav_products")}</div>', unsafe_allow_html=True)
+    st.markdown(f'<div class="nav-item">{t("nav_export")}</div>', unsafe_allow_html=True)
     st.divider()
-    st.caption("订单文件规范")
+    st.caption(t("file_schema"))
     st.code(", ".join(REQUIRED_COLUMNS), language="text")
     st.markdown(
-        """
+        f"""
         <div class="side-note">
-            <b>当前业务规则</b><br>
-            去重键：order_id + sku<br>
-            结算币种：人民币 CNY<br>
-            未配置持久化数据存储
+            <b>{t("rules")}</b><br>
+            {t("dedupe")}：{st.session_state.get("dedupe_summary", "order_id + sku")}<br>
+            {t("currency")}：{st.session_state.get("currency_name", "CNY (¥)")}<br>
+            {t("no_storage")}
         </div>
         """,
         unsafe_allow_html=True,
     )
 
 st.markdown(
-    """
+    f"""
     <div class="page-header">
         <div>
             <div class="eyebrow">E-commerce intelligence</div>
-            <div class="page-title">销售运营仪表盘</div>
-            <div class="page-subtitle">合并订单、清理异常数据并生成可交付的销售报表。</div>
+            <div class="page-title">{t("title")}</div>
+            <div class="page-subtitle">{t("subtitle")}</div>
         </div>
-        <div class="status-pill">● 会话内处理</div>
+        <div class="status-pill">{t("session")}</div>
     </div>
     """,
     unsafe_allow_html=True,
@@ -262,33 +465,33 @@ sample_paths = [
 with st.container(border=True):
     action_col, upload_col = st.columns([0.34, 0.66], gap="large")
     with action_col:
-        st.subheader("快速体验")
-        st.caption("使用模拟订单即时预览完整仪表盘。")
+        st.subheader(t("quick_start"))
+        st.caption(t("quick_caption"))
         if st.button(
-            "使用内置示例数据",
-            help="立即加载两份模拟订单，不会上传真实数据。",
+            t("use_demo"),
+            help=t("demo_help"),
             width="stretch",
         ):
             st.session_state["demo_mode"] = True
         if sample_path.exists():
             st.download_button(
-                "下载示例 CSV",
+                t("download_sample"),
                 data=sample_path.read_bytes(),
                 file_name="sample_orders.csv",
                 mime="text/csv",
                 width="stretch",
             )
     with upload_col:
-        st.subheader("导入订单")
+        st.subheader(t("import_orders"))
         uploaded_files = st.file_uploader(
-            "拖放或选择 CSV / XLSX 文件",
+            t("upload_label"),
             type=["csv", "xlsx"],
             accept_multiple_files=True,
-            help="可同时上传多个文件；每个文件必须包含相同的必要字段。",
+            help=t("upload_help"),
             label_visibility="collapsed",
         )
-        st.caption("支持 CSV、XLSX · 单个文件不超过 200 MB")
-        st.caption("公开演示请仅使用模拟或脱敏数据，请勿上传姓名、电话、地址等敏感信息。")
+        st.caption(t("upload_limit"))
+        st.caption(t("privacy"))
 
 if st.query_params.get("demo") == "true":
     st.session_state["demo_mode"] = True
@@ -297,11 +500,11 @@ files = sample_paths if st.session_state.get("demo_mode") else uploaded_files
 
 if not files:
     st.markdown(
-        """
+        f"""
         <div class="empty-state">
             <div style="font-size:1.7rem">✦</div>
-            <h3>准备好生成第一份销售报告了吗？</h3>
-            <p>选择内置示例，或上传你的订单文件开始分析。</p>
+            <h3>{t("empty_title")}</h3>
+            <p>{t("empty_text")}</p>
         </div>
         """,
         unsafe_allow_html=True,
@@ -309,34 +512,94 @@ if not files:
     st.stop()
 
 try:
-    orders, daily, products, stats = process_orders(files)
+    available_columns = inspect_order_columns(files[0])
+    suggested_mapping = suggest_column_mapping(available_columns)
 except ValueError as exc:
-    st.error(f"处理失败：{exc}")
-    st.stop()
-except Exception:
-    st.error("处理文件时发生未知错误，请检查文件格式后重试。")
+    st.error(f"{t('processing_failed')}：{exc}")
     st.stop()
 
-source_label = "内置示例" if st.session_state.get("demo_mode") else "上传"
-st.success(f"已成功处理 {len(files)} 个{source_label}文件。")
+with st.expander(t("config_title"), expanded=True):
+    st.caption(t("config_caption"))
+    st.markdown(f"**{t('field_mapping')}**")
+    mapping_columns = st.columns(3)
+    column_mapping: dict[str, str | None] = {}
+    mapping_options = [t("not_mapped"), *available_columns]
+    for index, canonical in enumerate(REQUIRED_COLUMNS):
+        suggested = suggested_mapping.get(canonical)
+        default_index = mapping_options.index(suggested) if suggested in mapping_options else 0
+        with mapping_columns[index % 3]:
+            selected = st.selectbox(
+                FIELD_LABELS[language][canonical],
+                mapping_options,
+                index=default_index,
+                key=f"mapping_{canonical}_{language}",
+            )
+            column_mapping[canonical] = None if selected == t("not_mapped") else selected
+
+    st.divider()
+    rule_col, currency_col, name_col = st.columns([1.35, 0.75, 1])
+    with rule_col:
+        dedupe_columns = st.multiselect(
+            t("dedupe_fields"),
+            options=list(REQUIRED_COLUMNS),
+            default=list(DEFAULT_DEDUPE_COLUMNS),
+            format_func=lambda field: FIELD_LABELS[language][field],
+            help=t("dedupe_help"),
+        )
+    with currency_col:
+        currency_name = st.selectbox(t("currency_label"), list(CURRENCIES))
+    with name_col:
+        report_name = st.text_input(t("report_name"), value="ecommerce_sales_report")
+
+currency_symbol = CURRENCIES[currency_name]
+safe_report_name = "".join(
+    character for character in report_name.strip() if character.isalnum() or character in ("-", "_")
+) or "ecommerce_sales_report"
+st.session_state["dedupe_summary"] = " + ".join(dedupe_columns) if dedupe_columns else "—"
+st.session_state["currency_name"] = currency_name
+
+try:
+    result = process_orders_with_quality(
+        files,
+        column_mapping=column_mapping,
+        dedupe_columns=dedupe_columns,
+    )
+    orders, daily, products, rejected, stats = (
+        result.cleaned,
+        result.daily,
+        result.products,
+        result.rejected,
+        result.stats,
+    )
+except ValueError as exc:
+    st.error(f"{t('processing_failed')}：{exc}")
+    st.stop()
+except Exception:
+    st.error(t("unknown_error"))
+    st.stop()
+
+source_label = t("source_demo") if st.session_state.get("demo_mode") else t("source_upload")
+st.success(t("processed", count=len(files), source=source_label))
 
 average_order_value = (
     stats["total_sales"] / stats["total_orders"] if stats["total_orders"] else 0
 )
 metric_1, metric_2, metric_3, metric_4 = st.columns(4)
-metric_1.metric("总销售额", f"¥{stats['total_sales']:,.2f}", "已完成汇总")
-metric_2.metric("平均订单金额", f"¥{average_order_value:,.2f}", "按有效订单")
-metric_3.metric("有效订单", f"{stats['total_orders']:,}", f"{stats['cleaned_rows']} 条明细")
-metric_4.metric("销售件数", f"{stats['total_units']:,.0f}", f"清理 {stats['duplicates'] + stats['invalid_rows']} 条")
+metric_1.metric(t("total_sales"), f"{currency_symbol}{stats['total_sales']:,.2f}", t("summary_done"))
+metric_2.metric(t("avg_order"), f"{currency_symbol}{average_order_value:,.2f}", t("per_order"))
+metric_3.metric(t("valid_orders"), f"{stats['total_orders']:,}", t("details", count=stats["cleaned_rows"]))
+metric_4.metric(t("units"), f"{stats['total_units']:,.0f}", t("cleaned", count=stats["rejected_rows"]))
 
 if stats["duplicates"] or stats["invalid_rows"]:
-    st.caption(
-        f"原始记录 {stats['original_rows']} 条 · 去除重复 {stats['duplicates']} 条 · "
-        f"排除无效数据 {stats['invalid_rows']} 条"
-    )
+    st.caption(t(
+        "quality_summary",
+        original=stats["original_rows"],
+        duplicates=stats["duplicates"],
+        invalid=stats["invalid_rows"],
+    ))
 
-dashboard_tab, product_tab, detail_tab = st.tabs(
-    ["Dashboard", "商品分析", "订单明细"]
+dashboard_tab, product_tab, detail_tab, quality_tab = st.tabs(
+    [t("tab_dashboard"), t("tab_products"), t("tab_details"), t("tab_quality")]
 )
 
 chart_layout = {
@@ -356,8 +619,8 @@ with dashboard_tab:
                 x="date",
                 y="sales",
                 markers=True,
-                labels={"date": "日期", "sales": "销售额（¥）"},
-                title="销售趋势",
+                labels={"date": t("date"), "sales": f"{t('sales_amount')} ({currency_symbol})"},
+                title=t("sales_trend"),
             )
             trend_figure.update_traces(
                 line={"color": "#6c4ce8", "width": 3},
@@ -368,7 +631,7 @@ with dashboard_tab:
             trend_figure.update_layout(**chart_layout, hovermode="x unified")
             trend_figure.update_xaxes(showgrid=False, title=None)
             trend_figure.update_yaxes(
-                gridcolor="#eeeaf7", zeroline=False, title=None, tickprefix="¥"
+                gridcolor="#eeeaf7", zeroline=False, title=None, tickprefix=currency_symbol
             )
             st.plotly_chart(trend_figure, width="stretch", config={"displayModeBar": False})
     with share_col:
@@ -381,18 +644,18 @@ with dashboard_tab:
                         hole=0.68,
                         marker_colors=["#5d3bd1", "#896cf0", "#c0b2f8", "#ded7fb"],
                         textinfo="none",
-                        hovertemplate="%{label}<br>¥%{value:,.2f}<extra></extra>",
+                        hovertemplate=f"%{{label}}<br>{currency_symbol}%{{value:,.2f}}<extra></extra>",
                     )
                 ]
             )
             share_figure.update_layout(
                 **chart_layout,
-                title="商品销售占比",
+                title=t("product_share"),
                 showlegend=True,
                 legend={"orientation": "h", "y": -0.08, "x": 0.02},
                 annotations=[
                     {
-                        "text": f"¥{stats['total_sales']:,.0f}<br><span style='font-size:11px'>总销售额</span>",
+                        "text": f"{currency_symbol}{stats['total_sales']:,.0f}<br><span style='font-size:11px'>{t('total_sales')}</span>",
                         "x": 0.5,
                         "y": 0.5,
                         "showarrow": False,
@@ -403,16 +666,16 @@ with dashboard_tab:
             st.plotly_chart(share_figure, width="stretch", config={"displayModeBar": False})
 
     with st.container(border=True):
-        st.markdown("#### 每日销售明细")
+        st.markdown(f"#### {t('daily_detail')}")
         st.dataframe(
             daily,
             width="stretch",
             hide_index=True,
             column_config={
-                "date": st.column_config.DateColumn("日期", format="YYYY-MM-DD"),
-                "order_count": st.column_config.NumberColumn("订单数", format="%d"),
-                "units_sold": st.column_config.NumberColumn("销售数量"),
-                "sales": st.column_config.NumberColumn("销售额", format="¥ %.2f"),
+                "date": st.column_config.DateColumn(t("date"), format="YYYY-MM-DD"),
+                "order_count": st.column_config.NumberColumn(t("order_count"), format="%d"),
+                "units_sold": st.column_config.NumberColumn(t("sales_units")),
+                "sales": st.column_config.NumberColumn(t("sales_amount"), format=f"{currency_symbol} %.2f"),
             },
         )
 
@@ -425,12 +688,12 @@ with product_tab:
             orientation="h",
             color="sales",
             color_continuous_scale=["#dcd4fb", "#6c4ce8"],
-            labels={"product": "商品", "sales": "销售额（¥）"},
-            title="商品销售额排行",
+            labels={"product": t("product"), "sales": f"{t('sales_amount')} ({currency_symbol})"},
+            title=t("product_ranking"),
             text_auto=".2s",
         )
         ranking_figure.update_layout(**chart_layout, coloraxis_showscale=False)
-        ranking_figure.update_xaxes(gridcolor="#eeeaf7", title=None, tickprefix="¥")
+        ranking_figure.update_xaxes(gridcolor="#eeeaf7", title=None, tickprefix=currency_symbol)
         ranking_figure.update_yaxes(title=None)
         st.plotly_chart(ranking_figure, width="stretch", config={"displayModeBar": False})
         st.dataframe(
@@ -439,12 +702,12 @@ with product_tab:
             hide_index=True,
             column_config={
                 "sku": "SKU",
-                "product": "商品",
-                "order_count": st.column_config.NumberColumn("订单数", format="%d"),
-                "units_sold": st.column_config.NumberColumn("销售数量"),
+                "product": t("product"),
+                "order_count": st.column_config.NumberColumn(t("order_count"), format="%d"),
+                "units_sold": st.column_config.NumberColumn(t("sales_units")),
                 "sales": st.column_config.ProgressColumn(
-                    "销售额",
-                    format="¥ %.2f",
+                    t("sales_amount"),
+                    format=f"{currency_symbol} %.2f",
                     min_value=0,
                     max_value=float(products["sales"].max()) if len(products) else 1,
                 ),
@@ -455,14 +718,14 @@ with detail_tab:
     with st.container(border=True):
         table_head, download_head = st.columns([0.72, 0.28])
         with table_head:
-            st.markdown("#### 清洗后订单")
-            st.caption(f"共 {len(orders)} 条有效明细，可直接导出交付。")
-        report = export_report(orders, daily, products)
+            st.markdown(f"#### {t('clean_orders')}")
+            st.caption(t("valid_caption", count=len(orders)))
+        report = export_report(orders, daily, products, rejected)
         with download_head:
             st.download_button(
-                "下载 Excel 报表",
+                t("download_excel"),
                 data=report,
-                file_name="ecommerce_sales_report.xlsx",
+                file_name=f"{safe_report_name}.xlsx",
                 mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
                 type="primary",
                 width="stretch",
@@ -472,12 +735,38 @@ with detail_tab:
             width="stretch",
             hide_index=True,
             column_config={
-                "order_id": "订单编号",
-                "date": st.column_config.DateColumn("日期", format="YYYY-MM-DD"),
-                "product": "商品",
+                "order_id": FIELD_LABELS[language]["order_id"],
+                "date": st.column_config.DateColumn(t("date"), format="YYYY-MM-DD"),
+                "product": t("product"),
                 "sku": "SKU",
-                "quantity": st.column_config.NumberColumn("数量"),
-                "unit_price": st.column_config.NumberColumn("单价", format="¥ %.2f"),
-                "sales": st.column_config.NumberColumn("销售额", format="¥ %.2f"),
+                "quantity": st.column_config.NumberColumn(FIELD_LABELS[language]["quantity"]),
+                "unit_price": st.column_config.NumberColumn(FIELD_LABELS[language]["unit_price"], format=f"{currency_symbol} %.2f"),
+                "sales": st.column_config.NumberColumn(t("sales_amount"), format=f"{currency_symbol} %.2f"),
             },
         )
+
+with quality_tab:
+    st.markdown(f"### {t('quality_title')}")
+    st.caption(t("quality_caption"))
+    quality_1, quality_2, quality_3, quality_4 = st.columns(4)
+    quality_1.metric(t("raw_rows"), f"{stats['original_rows']:,}")
+    quality_2.metric(t("valid_rows"), f"{stats['cleaned_rows']:,}")
+    quality_3.metric(t("duplicate_rows"), f"{stats['duplicates']:,}")
+    quality_4.metric(t("invalid_rows"), f"{stats['invalid_rows']:,}")
+
+    if rejected.empty:
+        st.success(t("quality_passed"))
+    else:
+        with st.container(border=True):
+            quality_head, quality_download = st.columns([0.72, 0.28])
+            with quality_head:
+                st.markdown(f"#### {t('rejected_title')}")
+            with quality_download:
+                st.download_button(
+                    t("download_rejected"),
+                    data=rejected.to_csv(index=False).encode("utf-8-sig"),
+                    file_name=f"{safe_report_name}_rejected.csv",
+                    mime="text/csv",
+                    width="stretch",
+                )
+            st.dataframe(rejected, width="stretch", hide_index=True)

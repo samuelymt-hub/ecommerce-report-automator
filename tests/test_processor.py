@@ -4,7 +4,13 @@ import pandas as pd
 import pytest
 from openpyxl import load_workbook
 
-from processor import export_report, process_orders, read_orders
+from processor import (
+    export_report,
+    process_orders,
+    process_orders_with_quality,
+    read_orders,
+    suggest_column_mapping,
+)
 
 
 def make_csv(rows: list[dict], name: str = "orders.csv") -> BytesIO:
@@ -147,3 +153,68 @@ def test_export_neutralizes_excel_formula_text() -> None:
     assert sheet["C2"].value == "'=2+2"
     assert sheet["D2"].data_type == "s"
     assert sheet["D2"].value == "'@TEST"
+
+
+def test_chinese_headers_are_mapped_automatically() -> None:
+    rows = [
+        {"订单编号": "CN001", "下单日期": "2026-10-01", "商品名称": "支架", "货号": "A1", "数量": 2, "单价": 19.9}
+    ]
+    cleaned, _, _, stats = process_orders([make_csv(rows)])
+    assert cleaned.loc[0, "order_id"] == "CN001"
+    assert cleaned.loc[0, "sku"] == "A1"
+    assert stats["total_sales"] == pytest.approx(39.8)
+
+
+def test_explicit_column_mapping_supports_custom_headers() -> None:
+    rows = [
+        {"编号": "X01", "时间": "2026-10-01", "名称": "A", "编码": "SKU1", "销量": 3, "金额": 12}
+    ]
+    mapping = {
+        "order_id": "编号",
+        "date": "时间",
+        "product": "名称",
+        "sku": "编码",
+        "quantity": "销量",
+        "unit_price": "金额",
+    }
+    cleaned, _, _, stats = process_orders([make_csv(rows)], column_mapping=mapping)
+    assert cleaned.loc[0, "order_id"] == "X01"
+    assert stats["total_sales"] == pytest.approx(36)
+
+
+def test_custom_deduplication_fields_are_applied() -> None:
+    rows = [
+        {"order_id": "1", "date": "2026-10-01", "product": "A", "sku": "A1", "quantity": 1, "unit_price": 10},
+        {"order_id": "1", "date": "2026-10-01", "product": "B", "sku": "B1", "quantity": 1, "unit_price": 20},
+    ]
+    result = process_orders_with_quality([make_csv(rows)], dedupe_columns=["order_id"])
+    assert len(result.cleaned) == 1
+    assert result.stats["duplicates"] == 1
+    assert result.rejected.loc[0, "rejection_reason"] == "duplicate by order_id"
+
+
+def test_quality_report_retains_invalid_and_duplicate_rows() -> None:
+    rows = [
+        {"order_id": "1", "date": "2026-10-01", "product": "A", "sku": "A1", "quantity": 1, "unit_price": 10},
+        {"order_id": "1", "date": "2026-10-01", "product": "A", "sku": "A1", "quantity": 1, "unit_price": 10},
+        {"order_id": "2", "date": "bad", "product": "B", "sku": "B1", "quantity": 0, "unit_price": 20},
+    ]
+    result = process_orders_with_quality([make_csv(rows)])
+    assert result.stats["rejected_rows"] == 2
+    assert set(result.rejected["rejection_reason"].str.contains("duplicate")) == {False, True}
+
+    workbook = export_report(result.cleaned, result.daily, result.products, result.rejected)
+    excel = pd.ExcelFile(BytesIO(workbook), engine="openpyxl")
+    assert excel.sheet_names == ["Cleaned Orders", "Daily Sales", "Product Ranking", "Rejected Rows"]
+
+
+def test_mapping_suggestions_recognize_mixed_language_headers() -> None:
+    suggestions = suggest_column_mapping(["订单号", "order date", "Product Name", "SKU", "件数", "售价"])
+    assert suggestions == {
+        "order_id": "订单号",
+        "date": "order_date",
+        "product": "product_name",
+        "sku": "sku",
+        "quantity": "件数",
+        "unit_price": "售价",
+    }

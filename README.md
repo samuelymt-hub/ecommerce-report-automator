@@ -19,11 +19,13 @@
 ### 主要功能
 
 - 同时上传多个 CSV 或 XLSX 订单文件
-- 自动规范化列名并校验必要字段
+- 自动识别常见中英文列名，并允许手动调整字段映射
 - 清理无效日期、数量和价格
-- 按 `order_id + sku` 去除重复明细
-- 展示销售指标、每日趋势、商品排行和订单明细
-- 导出 `Cleaned Orders`、`Daily Sales`、`Product Ranking` 三个工作表
+- 自定义去重字段组合，默认使用 `order_id + sku`
+- 展示销售指标、每日趋势、商品排行、订单明细和数据质量报告
+- 单独查看并下载重复或异常记录及其排除原因
+- 中英文界面切换、自定义显示币种和报表文件名
+- 导出 `Cleaned Orders`、`Daily Sales`、`Product Ranking`、`Rejected Rows` 四个工作表
 - 对可能触发 Excel 公式的文本进行安全转义
 
 ### 快速开始
@@ -58,12 +60,12 @@ python -m streamlit run app.py
 python -m pytest -v
 ```
 
-测试覆盖 CSV/XLSX 读取、列名规范化、订单号前导零、空文件、缺失或重复字段、异常日期与数值、重复订单、空结果、Excel 内容一致性和公式注入防护。
+测试覆盖 CSV/XLSX 读取、中英文列名识别、自定义字段映射、可配置去重、订单号前导零、空文件、缺失或重复字段、异常日期与数值、质量报告、Excel 内容一致性、双语界面和公式注入防护。
 
 ### 当前边界
 
-- 仅使用人民币，不处理汇率换算
-- 去重规则固定为 `order_id + sku`，重复时保留第一条
+- 币种选项只改变显示符号，不执行汇率换算
+- 重复记录始终保留第一条，去重字段可在界面中调整
 - 暂不处理退款、取消订单、税费、运费、库存和订单状态更新
 - 不包含账号、数据库、ERP/API 对接或云端持久化
 - 正式用于客户数据前，需要确认其唯一键和金额计算规则
@@ -91,11 +93,13 @@ E-commerce teams often merge order files, remove duplicates, calculate sales, an
 ### Features
 
 - Upload multiple CSV or XLSX order files
-- Normalize headers and validate required columns
+- Detect common Chinese and English headers and adjust field mappings manually
 - Clean invalid dates, quantities, and prices
-- Deduplicate line items by `order_id + sku`
-- View sales KPIs, daily trends, product rankings, and cleaned orders
-- Export `Cleaned Orders`, `Daily Sales`, and `Product Ranking` worksheets
+- Configure deduplication fields; the default is `order_id + sku`
+- View KPIs, daily trends, product rankings, cleaned orders, and a data-quality report
+- Review and download excluded rows with source files and rejection reasons
+- Switch between Chinese and English, select a display currency, and customize the report name
+- Export `Cleaned Orders`, `Daily Sales`, `Product Ranking`, and `Rejected Rows` worksheets
 - Neutralize formula-like text before writing Excel files
 
 ### Quick start
@@ -117,8 +121,8 @@ The two sample files contain 8 rows. After deduplication, 7 rows remain and tota
 
 ### Limitations
 
-- CNY only; no currency conversion
-- Fixed `order_id + sku` deduplication rule; first occurrence wins
+- Currency selection changes display symbols only; it does not convert values
+- Deduplication fields are configurable; the first occurrence is retained
 - Refunds, cancellations, shipping, tax, inventory, and status changes are not modeled
 - No authentication, database, ERP/API integration, or cloud persistence
 - Customer-specific identity and revenue rules must be confirmed before production use
@@ -141,6 +145,7 @@ EcommerceReportAutomator/
 ├── tests/
 ├── assets/
 ├── docs/portfolio-zh-en.md
+├── scripts/capture_portfolio.mjs
 ├── requirements.txt
 └── README.md
 ```
