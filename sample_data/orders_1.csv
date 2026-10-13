@@ -1,0 +1,5 @@
+order_id,date,product,sku,quantity,unit_price
+ORD001,2026-10-01,Phone Stand,P001,2,29.9
+ORD002,2026-10-01,Resistance Band,P002,3,39.0
+ORD003,2026-10-02,Water Bottle Bag,P003,1,59.9
+ORD004,2026-10-02,Phone Stand,P001,4,29.9
