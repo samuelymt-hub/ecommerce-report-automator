@@ -43,6 +43,9 @@ st.markdown(
         background: rgba(255,255,255,.96);
         border-right: 1px solid var(--line);
     }
+    [data-testid="stAppDeployButton"], [data-testid="stToolbar"] {
+        display: none;
+    }
     section[data-testid="stSidebar"] .block-container {
         padding: 1.7rem 1.2rem;
     }

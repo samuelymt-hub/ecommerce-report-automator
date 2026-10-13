@@ -6,6 +6,8 @@
 
 一个面向中小型电商业务的订单清洗、销售分析和 Excel 报表自动化工具。上传多个 CSV/XLSX 文件后，应用会自动校验、合并、去重和汇总订单，并生成可下载的 Excel 报表。
 
+![REPORTLY 销售运营仪表盘](assets/reportly-dashboard.png)
+
 > 当前版本：已发布的 MVP。仓库中的订单均为模拟数据，不包含真实客户信息。
 
 ## 中文说明
@@ -138,6 +140,7 @@ EcommerceReportAutomator/
 ├── sample_data/
 ├── tests/
 ├── assets/
+├── docs/portfolio-zh-en.md
 ├── requirements.txt
 └── README.md
 ```
