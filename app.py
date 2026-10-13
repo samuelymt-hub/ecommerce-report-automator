@@ -1,19 +1,24 @@
 """Streamlit interface for the E-commerce Report Automator."""
 
+import importlib
 from pathlib import Path
 
 import plotly.express as px
 import plotly.graph_objects as go
 import streamlit as st
 
-from processor import (
-    DEFAULT_DEDUPE_COLUMNS,
-    REQUIRED_COLUMNS,
-    export_report,
-    inspect_order_columns,
-    process_orders_with_quality,
-    suggest_column_mapping,
-)
+# Streamlit Cloud can keep imported local modules alive during a hot deploy while
+# rerunning this entrypoint. Reload the small processing module so app.py and
+# processor.py always come from the same deployed revision.
+import processor as _processor
+
+_processor = importlib.reload(_processor)
+DEFAULT_DEDUPE_COLUMNS = _processor.DEFAULT_DEDUPE_COLUMNS
+REQUIRED_COLUMNS = _processor.REQUIRED_COLUMNS
+export_report = _processor.export_report
+inspect_order_columns = _processor.inspect_order_columns
+process_orders_with_quality = _processor.process_orders_with_quality
+suggest_column_mapping = _processor.suggest_column_mapping
 
 
 COPY = {
