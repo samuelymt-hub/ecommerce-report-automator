@@ -6,6 +6,8 @@ def test_app_renders_upload_state() -> None:
 
     assert not app.exception
     assert any("销售运营仪表盘" in item.value for item in app.markdown)
+    assert any("会话内处理" in item.value for item in app.markdown)
+    assert any("请勿上传姓名、电话、地址等敏感信息" in item.value for item in app.caption)
     assert app.get("file_uploader")
 
 

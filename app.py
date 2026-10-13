@@ -230,7 +230,7 @@ with st.sidebar:
             <b>当前业务规则</b><br>
             去重键：order_id + sku<br>
             结算币种：人民币 CNY<br>
-            数据仅在本次会话中处理
+            未配置持久化数据存储
         </div>
         """,
         unsafe_allow_html=True,
@@ -244,7 +244,7 @@ st.markdown(
             <div class="page-title">销售运营仪表盘</div>
             <div class="page-subtitle">合并订单、清理异常数据并生成可交付的销售报表。</div>
         </div>
-        <div class="status-pill">● 本地安全处理</div>
+        <div class="status-pill">● 会话内处理</div>
     </div>
     """,
     unsafe_allow_html=True,
@@ -285,6 +285,7 @@ with st.container(border=True):
             label_visibility="collapsed",
         )
         st.caption("支持 CSV、XLSX · 单个文件不超过 200 MB")
+        st.caption("公开演示请仅使用模拟或脱敏数据，请勿上传姓名、电话、地址等敏感信息。")
 
 if st.query_params.get("demo") == "true":
     st.session_state["demo_mode"] = True

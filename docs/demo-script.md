@@ -1,5 +1,7 @@
 # 60-second demo script / 60 秒演示脚本
 
+在线演示 / Live demo: <https://ecommerce-report-automator.streamlit.app>
+
 ## 中文
 
 1. 展示两个模拟订单文件，说明其中包含一条重复记录。
@@ -7,7 +9,7 @@
 3. 展示结果：8 条原始记录、7 条有效记录、总销售额 ¥584.00。
 4. 切换销售趋势、商品排行和订单明细三个标签页。
 5. 下载 Excel 报表并展示三个工作表。
-6. 说明演示使用模拟数据，实际项目可以定制字段和业务规则。
+6. 说明演示使用模拟数据、公开页面不应上传敏感信息，实际项目可以定制字段和业务规则。
 
 ## English
 
@@ -16,4 +18,4 @@
 3. Show the result: 8 input rows, 7 clean rows, and ¥584.00 in total sales.
 4. Switch between daily trends, product rankings, and cleaned order details.
 5. Download the Excel report and show its three worksheets.
-6. Explain that the demo uses synthetic data and customer rules can be customized.
+6. Explain that the demo uses synthetic data, sensitive data should not be uploaded to the public app, and customer rules can be customized.

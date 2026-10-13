@@ -2,9 +2,11 @@
 
 [中文](#中文说明) · [English](#english)
 
+**在线演示 / Live demo：** [打开 REPORTLY 销售运营仪表盘](https://ecommerce-report-automator.streamlit.app)
+
 一个面向中小型电商业务的订单清洗、销售分析和 Excel 报表自动化工具。上传多个 CSV/XLSX 文件后，应用会自动校验、合并、去重和汇总订单，并生成可下载的 Excel 报表。
 
-> 当前版本：可本地运行的 MVP。仓库中的订单均为模拟数据，不包含真实客户信息。
+> 当前版本：已发布的 MVP。仓库中的订单均为模拟数据，不包含真实客户信息。
 
 ## 中文说明
 
@@ -66,7 +68,7 @@ python -m pytest -v
 
 ### 数据安全
 
-请勿把姓名、电话、地址、密钥或其他敏感数据提交到公开仓库。公开演示只应使用脱敏或模拟文件。
+公开演示部署在 Streamlit Community Cloud。上传的文件会发送到托管服务进行处理；本项目未配置数据库或其他持久化数据存储。请勿向公开演示或公开仓库提交姓名、电话、地址、密钥等敏感信息，只使用模拟或充分脱敏的数据。
 
 ### 定制开发
 
@@ -75,6 +77,10 @@ python -m pytest -v
 ---
 
 ## English
+
+### Live demo
+
+[Open the REPORTLY sales dashboard](https://ecommerce-report-automator.streamlit.app)
 
 ### The problem
 
@@ -114,6 +120,10 @@ The two sample files contain 8 rows. After deduplication, 7 rows remain and tota
 - Refunds, cancellations, shipping, tax, inventory, and status changes are not modeled
 - No authentication, database, ERP/API integration, or cloud persistence
 - Customer-specific identity and revenue rules must be confirmed before production use
+
+### Data safety
+
+The public demo runs on Streamlit Community Cloud. Uploaded files are sent to the hosted service for processing; this project does not configure a database or other persistent data store. Use synthetic or fully de-identified data only, and never upload names, phone numbers, addresses, credentials, or other sensitive information.
 
 ### Custom development
 
