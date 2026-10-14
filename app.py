@@ -34,8 +34,15 @@ COPY = {
         "no_storage": "未配置持久化数据存储",
         "title": "销售运营仪表盘",
         "subtitle": "合并订单、清理异常数据并生成可交付的销售报表。",
+        "orders_title": "订单中心",
+        "orders_subtitle": "搜索、筛选和检查每一笔清洗后的有效订单。",
+        "products_title": "商品表现",
+        "products_subtitle": "识别高贡献商品、销量结构和 SKU 表现。",
+        "reports_title": "报表与数据质量",
+        "reports_subtitle": "导出交付文件，并追踪重复或异常记录。",
         "session": "● 会话内处理",
         "quick_start": "快速体验",
+        "data_source": "数据来源与导入",
         "quick_caption": "使用模拟订单即时预览完整仪表盘。",
         "use_demo": "使用内置示例数据",
         "demo_help": "立即加载两份模拟订单，不会上传真实数据。",
@@ -64,6 +71,9 @@ COPY = {
         "avg_order": "平均订单金额",
         "valid_orders": "有效订单",
         "units": "销售件数",
+        "daily_revenue": "日均净收入",
+        "active_days": "{count} 个销售日",
+        "clean_revenue": "清洗后有效收入",
         "summary_done": "已完成汇总",
         "per_order": "按有效订单",
         "details": "{count} 条明细",
@@ -94,6 +104,25 @@ COPY = {
         "rejected_title": "排除记录明细",
         "download_rejected": "下载排除记录 CSV",
         "quality_passed": "没有发现重复或异常数据，本次文件全部通过质量检查。",
+        "recent_orders": "最近订单",
+        "recent_caption": "最近 {count} 条有效订单明细。",
+        "search_orders": "搜索订单号、商品或 SKU",
+        "filter_products": "筛选商品",
+        "date_range": "订单日期范围",
+        "filtered_sales": "筛选销售额",
+        "filtered_orders": "筛选订单数",
+        "filtered_units": "筛选销售件数",
+        "visible_rows": "当前明细",
+        "rows_count": "{count} 条记录",
+        "no_orders": "当前筛选条件下没有订单。",
+        "search_products": "搜索商品名称或 SKU",
+        "product_count": "商品数量",
+        "top_product": "销售冠军",
+        "top_sku": "冠军 SKU",
+        "top_share": "冠军销售占比",
+        "no_products": "当前搜索条件下没有商品。",
+        "export_center": "交付文件",
+        "export_caption": "Excel 包含有效订单、每日销售、商品排行和排除记录四个工作表。",
     },
     "en": {
         "nav_dashboard": "▦　Dashboard",
@@ -107,8 +136,15 @@ COPY = {
         "no_storage": "No persistent data storage configured",
         "title": "Sales Operations Dashboard",
         "subtitle": "Merge orders, remove invalid data, and generate delivery-ready sales reports.",
+        "orders_title": "Order center",
+        "orders_subtitle": "Search, filter, and inspect every cleaned valid order.",
+        "products_title": "Product performance",
+        "products_subtitle": "Identify high-contribution products, sales mix, and SKU performance.",
+        "reports_title": "Reports and data quality",
+        "reports_subtitle": "Export deliverables and trace duplicate or invalid records.",
         "session": "● Session processing",
         "quick_start": "Quick start",
+        "data_source": "Data source and import",
         "quick_caption": "Preview the full dashboard with synthetic orders.",
         "use_demo": "Use built-in sample data",
         "demo_help": "Load two synthetic order files instantly.",
@@ -137,6 +173,9 @@ COPY = {
         "avg_order": "Average order value",
         "valid_orders": "Valid orders",
         "units": "Units sold",
+        "daily_revenue": "Avg. daily net revenue",
+        "active_days": "{count} selling days",
+        "clean_revenue": "After data cleaning",
         "summary_done": "Summary ready",
         "per_order": "Per valid order",
         "details": "{count} line items",
@@ -167,6 +206,25 @@ COPY = {
         "rejected_title": "Excluded row details",
         "download_rejected": "Download excluded rows CSV",
         "quality_passed": "No duplicates or invalid rows were found. Every row passed the quality checks.",
+        "recent_orders": "Recent orders",
+        "recent_caption": "The latest {count} valid order line items.",
+        "search_orders": "Search order ID, product, or SKU",
+        "filter_products": "Filter products",
+        "date_range": "Order date range",
+        "filtered_sales": "Filtered sales",
+        "filtered_orders": "Filtered orders",
+        "filtered_units": "Filtered units",
+        "visible_rows": "Visible rows",
+        "rows_count": "{count} rows",
+        "no_orders": "No orders match the current filters.",
+        "search_products": "Search product name or SKU",
+        "product_count": "Products",
+        "top_product": "Top product",
+        "top_sku": "Top SKU",
+        "top_share": "Top sales share",
+        "no_products": "No products match the current search.",
+        "export_center": "Delivery files",
+        "export_caption": "The Excel workbook includes valid orders, daily sales, product ranking, and excluded rows.",
     },
 }
 
@@ -269,6 +327,28 @@ st.markdown(
         padding: .62rem .85rem;
         color: var(--muted);
         font-size: .92rem;
+    }
+    section[data-testid="stSidebar"] [data-testid="stRadio"] div[role="radiogroup"] {
+        gap: .35rem;
+    }
+    section[data-testid="stSidebar"] [data-testid="stRadio"] label {
+        min-height: 2.75rem;
+        padding: .68rem .85rem;
+        border-radius: .7rem;
+        color: var(--muted);
+        transition: background .18s ease, color .18s ease;
+    }
+    section[data-testid="stSidebar"] [data-testid="stRadio"] label:hover {
+        background: #f7f4ff;
+        color: var(--brand-dark);
+    }
+    section[data-testid="stSidebar"] [data-testid="stRadio"] label:has(input:checked) {
+        background: var(--brand-soft);
+        color: var(--brand-dark);
+        font-weight: 750;
+    }
+    section[data-testid="stSidebar"] [data-testid="stRadio"] label[data-testid="stRadioOption"] > div > div:first-child {
+        display: none;
     }
     .side-note {
         margin-top: 1.5rem;
@@ -397,6 +477,14 @@ st.markdown(
         [data-testid="stMetric"] { min-height: 7rem; padding: .9rem; }
         [data-testid="stMetricValue"] { font-size: 1.35rem; }
         [data-testid="stMetricDelta"] { font-size: .72rem; }
+        div[data-testid="stHorizontalBlock"]:has([data-testid="stMetric"]) {
+            flex-wrap: wrap;
+            gap: .75rem;
+        }
+        div[data-testid="stHorizontalBlock"]:has([data-testid="stMetric"]) > div[data-testid="stColumn"] {
+            flex: 1 1 calc(50% - .75rem);
+            min-width: calc(50% - .75rem);
+        }
     }
     @media (max-width: 800px) {
         .block-container { padding: 1.2rem 1rem 2.5rem; }
@@ -428,10 +516,13 @@ with st.sidebar:
         '<div class="brand"><span class="brand-mark">◈</span> REPORTLY</div>',
         unsafe_allow_html=True,
     )
-    st.markdown(f'<div class="nav-active">{t("nav_dashboard")}</div>', unsafe_allow_html=True)
-    st.markdown(f'<div class="nav-item">{t("nav_orders")}</div>', unsafe_allow_html=True)
-    st.markdown(f'<div class="nav-item">{t("nav_products")}</div>', unsafe_allow_html=True)
-    st.markdown(f'<div class="nav-item">{t("nav_export")}</div>', unsafe_allow_html=True)
+    page = st.radio(
+        "Navigation",
+        options=["dashboard", "orders", "products", "reports"],
+        format_func=lambda value: t(f"nav_{'export' if value == 'reports' else value}"),
+        label_visibility="collapsed",
+        key="active_page",
+    )
     st.divider()
     st.caption(t("file_schema"))
     st.code(", ".join(REQUIRED_COLUMNS), language="text")
@@ -447,13 +538,21 @@ with st.sidebar:
         unsafe_allow_html=True,
     )
 
+page_copy = {
+    "dashboard": (t("title"), t("subtitle")),
+    "orders": (t("orders_title"), t("orders_subtitle")),
+    "products": (t("products_title"), t("products_subtitle")),
+    "reports": (t("reports_title"), t("reports_subtitle")),
+}
+page_title, page_subtitle = page_copy[page]
+
 st.markdown(
     f"""
     <div class="page-header">
         <div>
             <div class="eyebrow">E-commerce intelligence</div>
-            <div class="page-title">{t("title")}</div>
-            <div class="page-subtitle">{t("subtitle")}</div>
+            <div class="page-title">{page_title}</div>
+            <div class="page-subtitle">{page_subtitle}</div>
         </div>
         <div class="status-pill">{t("session")}</div>
     </div>
@@ -467,7 +566,10 @@ sample_paths = [
     Path(__file__).parent / "sample_data" / "orders_2.csv",
 ]
 
-with st.container(border=True):
+if st.query_params.get("demo") == "true":
+    st.session_state["demo_mode"] = True
+
+with st.expander(t("data_source"), expanded=not st.session_state.get("demo_mode", False)):
     action_col, upload_col = st.columns([0.34, 0.66], gap="large")
     with action_col:
         st.subheader(t("quick_start"))
@@ -498,9 +600,6 @@ with st.container(border=True):
         st.caption(t("upload_limit"))
         st.caption(t("privacy"))
 
-if st.query_params.get("demo") == "true":
-    st.session_state["demo_mode"] = True
-
 files = sample_paths if st.session_state.get("demo_mode") else uploaded_files
 
 if not files:
@@ -523,7 +622,7 @@ except ValueError as exc:
     st.error(f"{t('processing_failed')}：{exc}")
     st.stop()
 
-with st.expander(t("config_title"), expanded=True):
+with st.expander(t("config_title"), expanded=not st.session_state.get("demo_mode", False)):
     st.caption(t("config_caption"))
     st.markdown(f"**{t('field_mapping')}**")
     mapping_columns = st.columns(3)
@@ -589,23 +688,8 @@ st.success(t("processed", count=len(files), source=source_label))
 average_order_value = (
     stats["total_sales"] / stats["total_orders"] if stats["total_orders"] else 0
 )
-metric_1, metric_2, metric_3, metric_4 = st.columns(4)
-metric_1.metric(t("total_sales"), f"{currency_symbol}{stats['total_sales']:,.2f}", t("summary_done"))
-metric_2.metric(t("avg_order"), f"{currency_symbol}{average_order_value:,.2f}", t("per_order"))
-metric_3.metric(t("valid_orders"), f"{stats['total_orders']:,}", t("details", count=stats["cleaned_rows"]))
-metric_4.metric(t("units"), f"{stats['total_units']:,.0f}", t("cleaned", count=stats["rejected_rows"]))
-
-if stats["duplicates"] or stats["invalid_rows"]:
-    st.caption(t(
-        "quality_summary",
-        original=stats["original_rows"],
-        duplicates=stats["duplicates"],
-        invalid=stats["invalid_rows"],
-    ))
-
-dashboard_tab, product_tab, detail_tab, quality_tab = st.tabs(
-    [t("tab_dashboard"), t("tab_products"), t("tab_details"), t("tab_quality")]
-)
+active_days = int(daily["date"].nunique()) if not daily.empty else 0
+average_daily_revenue = stats["total_sales"] / active_days if active_days else 0
 
 chart_layout = {
     "paper_bgcolor": "rgba(0,0,0,0)",
@@ -615,7 +699,82 @@ chart_layout = {
     "hoverlabel": {"bgcolor": "#211b36", "font_color": "white"},
 }
 
-with dashboard_tab:
+
+def order_table(frame):
+    """Render a consistently formatted order table."""
+    st.dataframe(
+        frame,
+        width="stretch",
+        hide_index=True,
+        column_config={
+            "order_id": FIELD_LABELS[language]["order_id"],
+            "date": st.column_config.DateColumn(t("date"), format="YYYY-MM-DD"),
+            "product": t("product"),
+            "sku": "SKU",
+            "quantity": st.column_config.NumberColumn(FIELD_LABELS[language]["quantity"]),
+            "unit_price": st.column_config.NumberColumn(
+                FIELD_LABELS[language]["unit_price"], format=f"{currency_symbol} %.2f"
+            ),
+            "sales": st.column_config.NumberColumn(
+                t("sales_amount"), format=f"{currency_symbol} %.2f"
+            ),
+        },
+    )
+
+
+def product_table(frame):
+    """Render a consistently formatted product performance table."""
+    max_sales = float(frame["sales"].max()) if len(frame) else 1
+    st.dataframe(
+        frame,
+        width="stretch",
+        hide_index=True,
+        column_config={
+            "sku": "SKU",
+            "product": t("product"),
+            "order_count": st.column_config.NumberColumn(t("order_count"), format="%d"),
+            "units_sold": st.column_config.NumberColumn(t("sales_units")),
+            "sales": st.column_config.ProgressColumn(
+                t("sales_amount"),
+                format=f"{currency_symbol} %.2f",
+                min_value=0,
+                max_value=max_sales,
+            ),
+        },
+    )
+
+
+if page == "dashboard":
+    metric_1, metric_2, metric_3, metric_4 = st.columns(4)
+    metric_1.metric(
+        t("total_sales"),
+        f"{currency_symbol}{stats['total_sales']:,.2f}",
+        t("clean_revenue"),
+    )
+    metric_2.metric(
+        t("avg_order"), f"{currency_symbol}{average_order_value:,.2f}", t("per_order")
+    )
+    metric_3.metric(
+        t("valid_orders"),
+        f"{stats['total_orders']:,}",
+        t("details", count=stats["cleaned_rows"]),
+    )
+    metric_4.metric(
+        t("daily_revenue"),
+        f"{currency_symbol}{average_daily_revenue:,.2f}",
+        t("active_days", count=active_days),
+    )
+
+    if stats["duplicates"] or stats["invalid_rows"]:
+        st.caption(
+            t(
+                "quality_summary",
+                original=stats["original_rows"],
+                duplicates=stats["duplicates"],
+                invalid=stats["invalid_rows"],
+            )
+        )
+
     trend_col, share_col = st.columns([0.66, 0.34], gap="large")
     with trend_col:
         with st.container(border=True):
@@ -671,62 +830,153 @@ with dashboard_tab:
             st.plotly_chart(share_figure, width="stretch", config={"displayModeBar": False})
 
     with st.container(border=True):
-        st.markdown(f"#### {t('daily_detail')}")
-        st.dataframe(
-            daily,
-            width="stretch",
-            hide_index=True,
-            column_config={
-                "date": st.column_config.DateColumn(t("date"), format="YYYY-MM-DD"),
-                "order_count": st.column_config.NumberColumn(t("order_count"), format="%d"),
-                "units_sold": st.column_config.NumberColumn(t("sales_units")),
-                "sales": st.column_config.NumberColumn(t("sales_amount"), format=f"{currency_symbol} %.2f"),
-            },
-        )
+        recent = orders.sort_values(["date", "order_id"], ascending=[False, False]).head(8)
+        st.markdown(f"#### {t('recent_orders')}")
+        st.caption(t("recent_caption", count=len(recent)))
+        order_table(recent)
 
-with product_tab:
-    with st.container(border=True):
-        ranking_figure = px.bar(
-            products.sort_values("sales"),
-            x="sales",
-            y="product",
-            orientation="h",
-            color="sales",
-            color_continuous_scale=["#dcd4fb", "#6c4ce8"],
-            labels={"product": t("product"), "sales": f"{t('sales_amount')} ({currency_symbol})"},
-            title=t("product_ranking"),
-            text_auto=".2s",
+elif page == "orders":
+    filter_col, product_col, date_col = st.columns([1.25, 1, 1], gap="medium")
+    with filter_col:
+        order_query = st.text_input(t("search_orders"), placeholder="ORD001 / SKU / Product")
+    with product_col:
+        selected_products = st.multiselect(
+            t("filter_products"),
+            sorted(orders["product"].dropna().unique().tolist()),
         )
-        ranking_figure.update_layout(**chart_layout, coloraxis_showscale=False)
-        ranking_figure.update_xaxes(gridcolor="#eeeaf7", title=None, tickprefix=currency_symbol)
-        ranking_figure.update_yaxes(title=None)
-        st.plotly_chart(ranking_figure, width="stretch", config={"displayModeBar": False})
-        st.dataframe(
-            products,
-            width="stretch",
-            hide_index=True,
-            column_config={
-                "sku": "SKU",
-                "product": t("product"),
-                "order_count": st.column_config.NumberColumn(t("order_count"), format="%d"),
-                "units_sold": st.column_config.NumberColumn(t("sales_units")),
-                "sales": st.column_config.ProgressColumn(
-                    t("sales_amount"),
-                    format=f"{currency_symbol} %.2f",
-                    min_value=0,
-                    max_value=float(products["sales"].max()) if len(products) else 1,
-                ),
-            },
-        )
+    with date_col:
+        if orders.empty:
+            selected_dates = ()
+            st.caption(t("date_range"))
+        else:
+            minimum_date = orders["date"].min().date()
+            maximum_date = orders["date"].max().date()
+            selected_dates = st.date_input(
+                t("date_range"),
+                value=(minimum_date, maximum_date),
+                min_value=minimum_date,
+                max_value=maximum_date,
+            )
 
-with detail_tab:
+    filtered_orders = orders.copy()
+    if order_query.strip():
+        query = order_query.strip()
+        search_columns = filtered_orders[["order_id", "product", "sku"]].astype(str)
+        search_mask = search_columns.apply(
+            lambda column: column.str.contains(query, case=False, regex=False)
+        ).any(axis=1)
+        filtered_orders = filtered_orders.loc[search_mask]
+    if selected_products:
+        filtered_orders = filtered_orders.loc[filtered_orders["product"].isin(selected_products)]
+    if isinstance(selected_dates, (tuple, list)) and len(selected_dates) == 2:
+        start_date, end_date = selected_dates
+        filtered_orders = filtered_orders.loc[
+            filtered_orders["date"].dt.date.between(start_date, end_date)
+        ]
+
+    filtered_sales = float(filtered_orders["sales"].sum())
+    filtered_order_count = int(filtered_orders["order_id"].nunique())
+    filtered_units = float(filtered_orders["quantity"].sum())
+    order_metric_1, order_metric_2, order_metric_3, order_metric_4 = st.columns(4)
+    order_metric_1.metric(t("filtered_sales"), f"{currency_symbol}{filtered_sales:,.2f}")
+    order_metric_2.metric(t("filtered_orders"), f"{filtered_order_count:,}")
+    order_metric_3.metric(t("filtered_units"), f"{filtered_units:,.0f}")
+    order_metric_4.metric(t("visible_rows"), f"{len(filtered_orders):,}")
+
     with st.container(border=True):
-        table_head, download_head = st.columns([0.72, 0.28])
-        with table_head:
-            st.markdown(f"#### {t('clean_orders')}")
-            st.caption(t("valid_caption", count=len(orders)))
-        report = export_report(orders, daily, products, rejected)
-        with download_head:
+        st.markdown(f"#### {t('clean_orders')}")
+        st.caption(t("rows_count", count=len(filtered_orders)))
+        if filtered_orders.empty:
+            st.info(t("no_orders"))
+        else:
+            order_table(filtered_orders.sort_values("date", ascending=False))
+
+elif page == "products":
+    product_query = st.text_input(t("search_products"), placeholder="SKU / Product")
+    filtered_products = products.copy()
+    if product_query.strip():
+        query = product_query.strip()
+        product_mask = (
+            filtered_products["product"].astype(str).str.contains(query, case=False, regex=False)
+            | filtered_products["sku"].astype(str).str.contains(query, case=False, regex=False)
+        )
+        filtered_products = filtered_products.loc[product_mask]
+
+    top_row = products.sort_values("sales", ascending=False).iloc[0] if len(products) else None
+    top_share_value = (
+        float(top_row["sales"]) / stats["total_sales"] * 100
+        if top_row is not None and stats["total_sales"]
+        else 0
+    )
+    product_metric_1, product_metric_2, product_metric_3, product_metric_4 = st.columns(4)
+    product_metric_1.metric(t("product_count"), f"{len(products):,}")
+    product_metric_2.metric(t("top_product"), str(top_row["product"]) if top_row is not None else "—")
+    product_metric_3.metric(t("top_sku"), str(top_row["sku"]) if top_row is not None else "—")
+    product_metric_4.metric(t("top_share"), f"{top_share_value:.1f}%")
+
+    if filtered_products.empty:
+        st.info(t("no_products"))
+    else:
+        product_chart_col, product_share_col = st.columns([0.66, 0.34], gap="large")
+        with product_chart_col:
+            with st.container(border=True):
+                ranking_figure = px.bar(
+                    filtered_products.sort_values("sales"),
+                    x="sales",
+                    y="product",
+                    orientation="h",
+                    color="sales",
+                    color_continuous_scale=["#dcd4fb", "#6c4ce8"],
+                    labels={
+                        "product": t("product"),
+                        "sales": f"{t('sales_amount')} ({currency_symbol})",
+                    },
+                    title=t("product_ranking"),
+                    text_auto=".2s",
+                )
+                ranking_figure.update_layout(**chart_layout, coloraxis_showscale=False)
+                ranking_figure.update_xaxes(
+                    gridcolor="#eeeaf7", title=None, tickprefix=currency_symbol
+                )
+                ranking_figure.update_yaxes(title=None)
+                st.plotly_chart(
+                    ranking_figure, width="stretch", config={"displayModeBar": False}
+                )
+        with product_share_col:
+            with st.container(border=True):
+                product_share_figure = go.Figure(
+                    data=[
+                        go.Pie(
+                            labels=filtered_products["product"],
+                            values=filtered_products["sales"],
+                            hole=0.68,
+                            marker_colors=["#5d3bd1", "#896cf0", "#c0b2f8", "#ded7fb"],
+                            textinfo="percent",
+                            hovertemplate=f"%{{label}}<br>{currency_symbol}%{{value:,.2f}}<extra></extra>",
+                        )
+                    ]
+                )
+                product_share_figure.update_layout(
+                    **chart_layout,
+                    title=t("product_share"),
+                    showlegend=True,
+                    legend={"orientation": "h", "y": -0.08, "x": 0.02},
+                )
+                st.plotly_chart(
+                    product_share_figure, width="stretch", config={"displayModeBar": False}
+                )
+
+        with st.container(border=True):
+            product_table(filtered_products.sort_values("sales", ascending=False))
+
+elif page == "reports":
+    report = export_report(orders, daily, products, rejected)
+    with st.container(border=True):
+        export_copy, export_action = st.columns([0.7, 0.3], gap="large")
+        with export_copy:
+            st.markdown(f"#### {t('export_center')}")
+            st.caption(t("export_caption"))
+        with export_action:
             st.download_button(
                 t("download_excel"),
                 data=report,
@@ -735,22 +985,7 @@ with detail_tab:
                 type="primary",
                 width="stretch",
             )
-        st.dataframe(
-            orders,
-            width="stretch",
-            hide_index=True,
-            column_config={
-                "order_id": FIELD_LABELS[language]["order_id"],
-                "date": st.column_config.DateColumn(t("date"), format="YYYY-MM-DD"),
-                "product": t("product"),
-                "sku": "SKU",
-                "quantity": st.column_config.NumberColumn(FIELD_LABELS[language]["quantity"]),
-                "unit_price": st.column_config.NumberColumn(FIELD_LABELS[language]["unit_price"], format=f"{currency_symbol} %.2f"),
-                "sales": st.column_config.NumberColumn(t("sales_amount"), format=f"{currency_symbol} %.2f"),
-            },
-        )
 
-with quality_tab:
     st.markdown(f"### {t('quality_title')}")
     st.caption(t("quality_caption"))
     quality_1, quality_2, quality_3, quality_4 = st.columns(4)

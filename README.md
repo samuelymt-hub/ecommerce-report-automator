@@ -8,7 +8,7 @@
 
 ![REPORTLY 销售运营仪表盘](assets/reportly-dashboard.png)
 
-> 当前版本：已发布的 MVP。仓库中的订单均为模拟数据，不包含真实客户信息。
+> 当前版本：V1.2。仓库中的订单均为模拟数据，不包含真实客户信息。
 
 ## 中文说明
 
@@ -22,7 +22,10 @@
 - 自动识别常见中英文列名，并允许手动调整字段映射
 - 清理无效日期、数量和价格
 - 自定义去重字段组合，默认使用 `order_id + sku`
-- 展示销售指标、每日趋势、商品排行、订单明细和数据质量报告
+- 可用的侧边导航：Dashboard、订单中心、商品表现、报表与数据质量
+- 展示总销售额、平均订单金额、有效订单数、清洗后日均净收入和每日趋势
+- 在订单中心按关键词、商品与日期范围筛选订单
+- 在商品页面搜索 SKU、查看商品销售排行、销售占比和冠军商品
 - 单独查看并下载重复或异常记录及其排除原因
 - 中英文界面切换、自定义显示币种和报表文件名
 - 导出 `Cleaned Orders`、`Daily Sales`、`Product Ranking`、`Rejected Rows` 四个工作表
@@ -96,7 +99,10 @@ E-commerce teams often merge order files, remove duplicates, calculate sales, an
 - Detect common Chinese and English headers and adjust field mappings manually
 - Clean invalid dates, quantities, and prices
 - Configure deduplication fields; the default is `order_id + sku`
-- View KPIs, daily trends, product rankings, cleaned orders, and a data-quality report
+- Navigate between a functional Dashboard, Order center, Product performance, and Reports pages
+- View total sales, average order value, valid orders, average daily net revenue, and daily trends
+- Filter orders by keyword, product, and date range
+- Search SKUs and review product rankings, sales mix, and the top-performing product
 - Review and download excluded rows with source files and rejection reasons
 - Switch between Chinese and English, select a display currency, and customize the report name
 - Export `Cleaned Orders`, `Daily Sales`, `Product Ranking`, and `Rejected Rows` worksheets
