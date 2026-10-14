@@ -289,8 +289,23 @@ st.markdown(
         background: rgba(255,255,255,.96);
         border-right: 1px solid var(--line);
     }
-    [data-testid="stAppDeployButton"], [data-testid="stToolbar"] {
+    [data-testid="stAppDeployButton"] {
         display: none;
+    }
+    [data-testid="stToolbar"] {
+        background: transparent;
+    }
+    [data-testid="stSidebarCollapseButton"] {
+        visibility: visible !important;
+    }
+    [data-testid="stExpandSidebarButton"] {
+        visibility: visible !important;
+        margin: .45rem;
+        padding: .35rem;
+        border: 1px solid var(--line);
+        border-radius: .65rem;
+        background: rgba(255,255,255,.94);
+        box-shadow: 0 6px 18px rgba(34,24,72,.08);
     }
     section[data-testid="stSidebar"] .block-container {
         padding: 1.7rem 1.2rem;
